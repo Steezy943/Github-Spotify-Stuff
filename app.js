@@ -1,5 +1,5 @@
-// Change this line to your real, live Vercel domain followed by /api/token
-const TOKEN_GATEWAY_URL = 'https://github-spotify-stuff.vercel.app/';
+// CONFIGURATION: Pointing exactly to your secure serverless function endpoint path
+const TOKEN_GATEWAY_URL = 'https://vercel.app';
 
 const searchBox = document.getElementById('search-box');
 const resultsDiv = document.getElementById('results');
