@@ -1,65 +1,71 @@
-// CONFIGURATION: Pointing exactly to your secure serverless function endpoint path
-const TOKEN_GATEWAY_URL = 'https://vercel.app';
+// CONFIGURATION: Set your authenticated Spotify Client ID
+const CLIENT_ID = 'e2bb7a1c76bc42fc9b75fcacc1bf909e'; 
+
+// Dynamically locks into your active GitHub Pages URL structure
+const REDIRECT_URI = window.location.origin + window.location.pathname;
 
 const searchBox = document.getElementById('search-box');
 const resultsDiv = document.getElementById('results');
-let sessionToken = '';
 
-// Internal token distribution pipeline handling automated cache distribution
-async function requestActiveSessionToken() {
-    if (sessionToken) return sessionToken;
-    
-    try {
-        const response = await fetch(TOKEN_GATEWAY_URL);
-        const data = await response.json();
-        sessionToken = data.access_token;
-        return sessionToken;
-    } catch (err) {
-        console.error("Critical Token Request Error: ", err);
-        return null;
-    }
+// 1. EXTRACT PASS TOKENS DIRECTLY FROM URL HASH
+function getImplicitAccessToken() {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    return hashParams.get('access_token');
 }
 
-// Global enter key event binding maps
+const activeToken = getImplicitAccessToken();
+
+// 2. FORCE AUTOMATED CLIENT REDIRECT IF TOKEN DOES NOT EXIST
+if (!activeToken) {
+    resultsDiv.innerHTML = '<p class="status-msg">Redirecting to Spotify account verification...</p>';
+    
+    // Scopes needed to access default music tracking parameters
+    const authEndpoint = `https://spotify.com` +
+                         `?client_id=${encodeURIComponent(CLIENT_ID)}` +
+                         `&response_type=token` +
+                         `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+                         `&scope=user-read-private%20user-read-email`;
+                         
+    // Instantly sends the user to authenticate without relying on blocked domains
+    window.location.href = authEndpoint;
+} else {
+    // If the token exists, clean up URL hash clutter instantly for structural privacy
+    window.history.pushState("", document.title, window.location.pathname + window.location.search);
+}
+
+// 3. LISTEN FOR SEARCH ARGUMENTS
 searchBox.addEventListener('keyup', async (e) => {
     if (e.key === 'Enter' && e.target.value.trim() !== '') {
-        const queryValue = e.target.value.trim();
+        const userQuery = e.target.value.trim();
         resultsDiv.innerHTML = '<p class="status-msg">Searching absolute live databases...</p>';
-        
-        const token = await requestActiveSessionToken();
-        if (!token) {
-            resultsDiv.innerHTML = '<p class="status-msg" style="color:#ff4444;">Authorization failure. Verify backend setup variables.</p>';
-            return;
-        }
 
         try {
-            // Queries tracks natively via client credential token authorization blocks
-            const response = await fetch(`https://spotify.com{encodeURIComponent(queryValue)}&type=track&limit=12`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const response = await fetch(`https://spotify.com{encodeURIComponent(userQuery)}&type=track&limit=12`, {
+                headers: { 'Authorization': `Bearer ${activeToken}` }
             });
 
             if (response.status === 401) {
-                // Wipe cache memory tracking references if an internal authorization structure times out
-                sessionToken = '';
-                resultsDiv.innerHTML = '<p class="status-msg">Token rotation refresh execution... retry search command.</p>';
+                // If the temporary session token expires, clear the page hash and reload the login portal
+                window.location.hash = '';
+                window.location.reload();
                 return;
             }
 
             const payload = await response.json();
             renderActiveTrackCards(payload.tracks.items);
         } catch (error) {
-            console.error("API Call Exception: ", error);
-            resultsDiv.innerHTML = '<p class="status-msg" style="color:#ff4444;">Search exception error. Please try again.</p>';
+            console.error("Search API Failure: ", error);
+            resultsDiv.innerHTML = '<p class="status-msg" style="color:#ff4444;">Connection failed. Check network status.</p>';
         }
     }
 });
 
-// Presentation rendering factory processing multi-artist tracking loops
+// 4. GENERATE CONTENT PRESENTATION CARDS
 function renderActiveTrackCards(trackList) {
     resultsDiv.innerHTML = '';
     
     if (!trackList || trackList.length === 0) {
-        resultsDiv.innerHTML = '<p class="status-msg">No matching creator assets could be localized on standard catalogs.</p>';
+        resultsDiv.innerHTML = '<p class="status-msg">No matching creator assets could be localized.</p>';
         return;
     }
 
@@ -73,7 +79,7 @@ function renderActiveTrackCards(trackList) {
                 <h3>${sanitizeInput(track.name)}</h3>
                 <p>Creator: ${sanitizeInput(compiledArtists)}</p>
             </div>
-            <!-- Spotify Universal Content Direct Widget Embed -->
+            <!-- Embedded content layer utilizes native widget structures -->
             <iframe 
                 src="https://spotify.com{track.id}?utm_source=generator&theme=0" 
                 width="100%" 
@@ -87,7 +93,6 @@ function renderActiveTrackCards(trackList) {
     });
 }
 
-// XSS Sanitization Filter
 function sanitizeInput(inputString) {
     return inputString.replace(/&/g, "&amp;")
                       .replace(/</g, "&lt;")
