@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cobra Universal Music Browser</title>
+    <title>Cobra Firewall-Proof Music Browser</title>
     <style>
         :root {
-            --spotify-green: #1DB954;
-            --bg-dark: #121212;
-            --card-surface: #181818;
-            --text-main: #FFFFFF;
-            --text-secondary: #B3B3B3;
+            --primary-accent: #8a2be2;
+            --bg-dark: #0f0f12;
+            --card-surface: #16161f;
+            --text-main: #ffffff;
+            --text-secondary: #a0a0b0;
         }
 
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
-            padding: 40px 20px;
+            padding: 40px 20px 120px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -27,71 +27,115 @@
         h1 {
             font-size: 2.2rem;
             margin-bottom: 5px;
-            letter-spacing: -0.5px;
+            background: linear-gradient(45deg, #ff007f, #8a2be2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
             color: var(--text-secondary);
             margin-bottom: 35px;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         #search-container {
             width: 100%;
-            max-width: 650px;
-            margin-bottom: 40px;
+            max-width: 600px;
+            margin-bottom: 30px;
         }
 
         #search-box {
             width: 100%;
             padding: 16px 24px;
             font-size: 16px;
-            border: none;
+            border: 1px solid #2d2d3d;
             border-radius: 30px;
-            background-color: #242424;
+            background-color: #1a1a24;
             color: var(--text-main);
             outline: none;
             box-sizing: border-box;
-            transition: box-shadow 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         #search-box:focus {
-            box-shadow: 0 0 0 2px var(--spotify-green);
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
         }
 
         #results {
             width: 100%;
-            max-width: 750px;
+            max-width: 700px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 14px;
         }
 
         .track-card {
             background-color: var(--card-surface);
             border-radius: 12px;
-            padding: 20px;
+            padding: 16px 20px;
             display: flex;
-            flex-direction: column;
-            gap: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 1px solid #1f1f2e;
+        }
+
+        .track-details {
+            flex-grow: 1;
+            margin-right: 20px;
         }
 
         .track-details h3 {
             margin: 0 0 4px 0;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
         }
 
         .track-details p {
             margin: 0;
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
-        iframe {
+        .play-btn {
+            background: linear-gradient(135deg, #ff007f, #8a2be2);
+            color: #fff;
             border: none;
-            border-radius: 12px;
-            background-color: transparent;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+        }
+
+        #player-dock {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #111118;
+            border-top: 2px solid var(--primary-accent);
+            padding: 20px;
+            box-sizing: border-box;
+            display: none;
+            text-align: center;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.6);
+        }
+
+        #now-playing {
+            margin: 0 0 10px 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        audio {
+            width: 100%;
+            max-width: 600px;
         }
 
         .status-msg {
@@ -103,17 +147,24 @@
 </head>
 <body>
 
-    <h1>Cobra Music Browser</h1>
-    <div class="subtitle">Search any creator or track across the absolute global catalog</div>
+    <h1>Cobra Music Console</h1>
+    <div class="subtitle">Direct client-side streaming engine. No login redirections required.</div>
 
     <div id="search-container">
-        <input type="text" id="search-box" placeholder="Search tracks, artists, or niche creators... (Press Enter)">
+        <input type="text" id="search-box" placeholder="Search track name, genre, or indie creator... (Press Enter)">
     </div>
 
     <div id="results">
-        <p class="status-msg">Type above and press enter to stream tracks instantly.</p>
+        <p class="status-msg">Enter a keyword search parameter to begin indexing audio assets.</p>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Persistent Fixed Media Control Overlay -->
+    <div id="player-dock">
+        <p id="now-playing">Selected Track: None</p>
+        <audio id="audio-engine" controls autoplay></audio>
+    </div>
+
+    <!-- Appends a version query string to clear out local browser cache records -->
+    <script src="app.js?v=3.0"></script>
 </body>
 </html>
