@@ -1,5 +1,5 @@
 // CONFIGURATION: Replace this string with the Client ID from your Spotify Dashboard image
-const CLIENT_ID = 'YOUR_SPOTIFY_CLIENT_ID_HERE'; 
+const CLIENT_ID = 'e2bb7a1c76bc42fc9b75fcacc1bf909e'; 
 
 // Automatically builds your callback URL dynamically to prevent mismatch errors
 const REDIRECT_URI = window.location.origin + window.location.pathname;
