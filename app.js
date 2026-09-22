@@ -1,102 +1,73 @@
-// CONFIGURATION: Set your authenticated Spotify Client ID
-const CLIENT_ID = 'e2bb7a1c76bc42fc9b75fcacc1bf909e'; 
-
-// Dynamically locks into your active GitHub Pages URL structure
-const REDIRECT_URI = window.location.origin + window.location.pathname;
-
 const searchBox = document.getElementById('search-box');
 const resultsDiv = document.getElementById('results');
+const playerDock = document.getElementById('player-dock');
+const audioEngine = document.getElementById('audio-engine');
+const nowPlayingText = document.getElementById('now-playing');
 
-// 1. EXTRACT PASS TOKENS DIRECTLY FROM URL HASH
-function getImplicitAccessToken() {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    return hashParams.get('access_token');
-}
+// Direct open-source fallback engine client key parameters
+const CLIENT_ID = 'b736b412'; 
 
-const activeToken = getImplicitAccessToken();
-
-// 2. FORCE AUTOMATED CLIENT REDIRECT IF TOKEN DOES NOT EXIST
-if (!activeToken) {
-    resultsDiv.innerHTML = '<p class="status-msg">Redirecting to Spotify account verification...</p>';
-    
-    // Scopes needed to access default music tracking parameters
-    const authEndpoint = `https://spotify.com` +
-                         `?client_id=${encodeURIComponent(CLIENT_ID)}` +
-                         `&response_type=token` +
-                         `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-                         `&scope=user-read-private%20user-read-email`;
-                         
-    // Instantly sends the user to authenticate without relying on blocked domains
-    window.location.href = authEndpoint;
-} else {
-    // If the token exists, clean up URL hash clutter instantly for structural privacy
-    window.history.pushState("", document.title, window.location.pathname + window.location.search);
-}
-
-// 3. LISTEN FOR SEARCH ARGUMENTS
 searchBox.addEventListener('keyup', async (e) => {
     if (e.key === 'Enter' && e.target.value.trim() !== '') {
-        const userQuery = e.target.value.trim();
-        resultsDiv.innerHTML = '<p class="status-msg">Searching absolute live databases...</p>';
+        const queryValue = e.target.value.trim();
+        resultsDiv.innerHTML = '<p class="status-msg">Querying decentralized open audio clusters...</p>';
 
         try {
-            const response = await fetch(`https://spotify.com{encodeURIComponent(userQuery)}&type=track&limit=12`, {
-                headers: { 'Authorization': `Bearer ${activeToken}` }
-            });
-
-            if (response.status === 401) {
-                // If the temporary session token expires, clear the page hash and reload the login portal
-                window.location.hash = '';
-                window.location.reload();
-                return;
-            }
-
+            // Uses standard Jamendo API parameters for direct track list retrieval
+            const apiEndpoint = `https://jamendo.com{CLIENT_ID}&format=json&limit=15&namesearch=${encodeURIComponent(queryValue)}&include=musicinfo`;
+            
+            const response = await fetch(apiEndpoint);
             const payload = await response.json();
-            renderActiveTrackCards(payload.tracks.items);
+            
+            renderTrackList(payload.results);
         } catch (error) {
-            console.error("Search API Failure: ", error);
-            resultsDiv.innerHTML = '<p class="status-msg" style="color:#ff4444;">Connection failed. Check network status.</p>';
+            console.error("Audio Node Exception Connection Blown: ", error);
+            resultsDiv.innerHTML = '<p class="status-msg" style="color:#ff4444;">Core search route block. Network firewall restrictions detected.</p>';
         }
     }
 });
 
-// 4. GENERATE CONTENT PRESENTATION CARDS
-function renderActiveTrackCards(trackList) {
+function renderTrackList(tracks) {
     resultsDiv.innerHTML = '';
     
-    if (!trackList || trackList.length === 0) {
-        resultsDiv.innerHTML = '<p class="status-msg">No matching creator assets could be localized.</p>';
+    if (!tracks || tracks.length === 0) {
+        resultsDiv.innerHTML = '<p class="status-msg">No open source creative assets matched this string context.</p>';
         return;
     }
 
-    trackList.forEach(track => {
-        const compiledArtists = track.artists.map(creator => creator.name).join(', ');
+    tracks.forEach(track => {
         const cardElement = document.createElement('div');
         cardElement.className = 'track-card';
         
+        // Escape parameters completely to prevent cross site template compilation script errors
+        const cleanTitle = sanitizeHtml(track.name);
+        const cleanArtist = sanitizeHtml(track.artist_name);
+        
         cardElement.innerHTML = `
             <div class="track-details">
-                <h3>${sanitizeInput(track.name)}</h3>
-                <p>Creator: ${sanitizeInput(compiledArtists)}</p>
+                <h3>${cleanTitle}</h3>
+                <p>Creator: ${cleanArtist}</p>
             </div>
-            <!-- Embedded content layer utilizes native widget structures -->
-            <iframe 
-                src="https://spotify.com{track.id}?utm_source=generator&theme=0" 
-                width="100%" 
-                height="152" 
-                allowfullscreen="" 
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                loading="lazy">
-            </iframe>
+            <!-- Binds direct mp3 streaming link to localized player context -->
+            <button class="play-btn" onclick="executeAudioStream('${track.audio}', '${cleanTitle.replace(/'/g, "\\'")}')">Stream</button>
         `;
         resultsDiv.appendChild(cardElement);
     });
 }
 
-function sanitizeInput(inputString) {
-    return inputString.replace(/&/g, "&amp;")
-                      .replace(/</g, "&lt;")
-                      .replace(/>/g, "&gt;")
-                      .replace(/"/g, "&quot;")
-                      .replace(/'/g, "&#039;");
+// Routes raw mp3 file vectors directly into native HTML5 runtime controls
+window.executeAudioStream = function(audioUrl, trackTitle) {
+    if (!audioUrl) return;
+    
+    // Inject the raw un-embedded streaming sound asset directly into the audio player source
+    audioEngine.src = audioUrl;
+    nowPlayingText.innerHTML = `Streaming: <strong>${trackTitle}</strong>`;
+    playerDock.style.display = 'block';
+    
+    audioEngine.load();
+    audioEngine.play().catch(err => console.log("Autoplay configuration restriction handled: ", err));
+};
+
+function sanitizeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
