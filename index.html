@@ -1,1 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Browser</title>
+    <style>
+        :root {
+            --spotify-green: #1DB954;
+            --bg-black: #121212;
+            --card-gray: #181818;
+            --text-white: #FFFFFF;
+            --text-muted: #B3B3B3;
+        }
 
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background-color: var(--spotify-green);
+            color: var(--text-white);
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.04);
+        }
+
+        #search-container {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        #search-box {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 30px;
+            background-color: #242424;
+            color: var(--text-white);
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        #search-box:focus {
+            box-shadow: 0 0 0 2px var(--text-white);
+        }
+
+        #results {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .track-card {
+            background-color: var(--card-gray);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .track-info h3 {
+            margin: 0 0 4px 0;
+            font-size: 1.2rem;
+        }
+
+        .track-info p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        iframe {
+            border: none;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Music Browser</h1>
+
+    <!-- Authentication Trigger -->
+    <button id="login-btn" class="btn">Connect Spotify to Browse</button>
+
+    <!-- Search Input Area -->
+    <div id="search-container">
+        <input type="text" id="search-box" placeholder="What do you want to listen to? (Press Enter)">
+    </div>
+
+    <!-- Music Player Grid -->
+    <div id="results"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
